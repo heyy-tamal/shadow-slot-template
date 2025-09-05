@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css">
+    <title>PixiJS - Template</title>
+</head>
+
+<body>
+    <div id="app">
+        <div id="pixi-container"></div>
+        <div class="rectangle">
+            <img src="/assets/desktop/spinBtn.png" alt="Spin" class="spin-btn" />
+            <div class="controls">
+                <button class="buy-bonus">BUY BONUS</button>
+                <div class="balance-bet">
+                    <div class="balance">
+                        <span class="label">BALANCE</span>
+                        <span class="value">€5,000.00</span>
+                    </div>
+                    <div class="bet">
+                        <span class="label">STAKE</span>
+                        <span class="value">€2.00</span>
+                    </div>
+                    <div class="total-win">
+                        <span class="label">TOTAL WIL</span>
+                        <span class="value">€2.00</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="insufficient-popup" class="insufficient-popup" style="display:none;">
+        <div class="popup-content">
+            <p>Insufficient balance for this bet!</p>
+            <button id="insufficient-ok-btn">OK</button>
+        </div>
+    </div>
+</body>
+
+</html>

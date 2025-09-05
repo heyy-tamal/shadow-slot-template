@@ -1,0 +1,12 @@
+[
+  {
+    "playerId": "player123",
+    "balance": 748,
+    "currency": "USD"
+  },
+  {
+    "playerId": "player456",
+    "balance": 200,
+    "currency": "EUR"
+  }
+]

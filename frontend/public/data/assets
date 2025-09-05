@@ -1,0 +1,15 @@
+{
+  "manifest": {
+    "bundles": [
+      {
+        "name": "wrapper",
+        "assets": [
+          {
+            "alias": "spinBtn",
+            "src": "./assets/desktop/spinBtn.png"
+          }
+        ]
+      }
+    ]
+  }
+}
