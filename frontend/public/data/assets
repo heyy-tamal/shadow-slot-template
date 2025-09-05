@@ -9,6 +9,15 @@
             "src": "./assets/desktop/spinBtn.png"
           }
         ]
+      },
+      {
+        "name": "gameclient",
+        "assets": [
+          {
+            "alias": "baseBG",
+            "src": "./assets/desktop/background.jpg"
+          }
+        ]
       }
     ]
   }

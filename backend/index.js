@@ -25,12 +25,12 @@ function savePlayers(data) {
 
 // Generate reels
 function generateReels() {
-  const symbols = ['A', 'B', 'C', 'D', 'W']; // Wild symbol
+  const symbols = ['A', 'B', 'C', 'D', 'W', 'S'];
   const reels = [];
 
-  for (let i = 0; i < 5; i++) {
+  for (let col = 0; col < 5; col++) {
     const reel = [];
-    for (let j = 0; j < 3; j++) {
+    for (let row = 0; row < 3; row++) {
       const symbol = symbols[Math.floor(Math.random() * symbols.length)];
       reel.push(symbol);
     }
@@ -40,15 +40,46 @@ function generateReels() {
   return reels;
 }
 
+function checkForScatters(reels) {
+  const scatterPositions = [];
+
+  for (let row = 0; row < reels[0].length; row++) {
+    for (let col = 0; col < reels.length; col++) {
+      if (reels[col][row] === 'S') {
+        scatterPositions.push({ row, col });
+      }
+    }
+  }
+
+  let freeSpinsAwarded = 0;
+  if (scatterPositions.length >= 3) {
+    freeSpinsAwarded = 10;
+  }
+  return { freeSpinsAwarded, scatterPositions };
+}
+
+
+//random method
+function randomMethod() {
+  let arrMethod = ["find", "some", "every"];
+  let randomIndex = Math.floor(Math.random() * arrMethod.length);
+  return arrMethod[randomIndex];
+}
+
 // Determine win
 function calculateWin(reels, stake) {
   const middleRow = reels.map(reel => reel[1]); // middle row
-  const allSame = middleRow.every(symbol => symbol === middleRow[0]);
+  const randMethod = randomMethod();
+  const allSame = middleRow[randMethod](symbol => symbol === middleRow[0]);
   const winAmount = allSame ? stake * 10 : 0;
+
+  // SCATTER CHECK
+  const scatterResult = checkForScatters(reels);
 
   return {
     isWin: allSame,
     winAmount,
+    scatterResult,
     matchedSymbols: allSame ? middleRow[0] : null,
     triggeredFeatures: allSame && middleRow[0] === 'W' ? ['WILD_BONUS'] : []
   };
@@ -112,6 +143,7 @@ app.post('/api/spin', (req, res) => {
 
   // Generate spin outcome
   const reels = generateReels();
+  const scatters = checkForScatters(reels);
   const spin = calculateWin(reels, stake);
 
   // Add winnings if any
@@ -143,6 +175,6 @@ app.post('/api/spin', (req, res) => {
 // ─────────────────────────────────────────────
 // Start the server
 // ─────────────────────────────────────────────
-app.listen(3000, () => {
-  console.log('API server running on http://localhost:3000');
+app.listen(3210, () => {
+  console.log('API server running on http://localhost:3210');
 });

@@ -28,7 +28,7 @@ export class Wrapper extends Container {
 
     private async initializeGame() {
         try {
-            const response = await fetch('http://localhost:3000/api/initResult', {
+            const response = await fetch('http://localhost:3210/api/initResult', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -82,7 +82,7 @@ export class Wrapper extends Container {
         this.disableSpinButton();
 
         try {
-            const response = await fetch('http://localhost:3000/api/spin', {
+            const response = await fetch('http://localhost:3210/api/spin', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
