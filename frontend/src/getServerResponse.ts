@@ -16,7 +16,7 @@ interface SpinResult {
     triggeredFeatures: string[];
 }
 
-export class Wrapper extends Container {
+export class getServerResponse extends Container {
     private gameState: GameState | null = null;
     private isSpinning: boolean = false;
 
@@ -42,22 +42,25 @@ export class Wrapper extends Container {
 
             const result = await response.json();
 
-            if (result.status === 'success') {
+            if (result.status === 'success' && result.data) {
+                const data = result.data;
                 this.gameState = {
-                    playerId: result.data.playerId,
-                    sessionId: result.data.sessionId,
-                    balance: result.data.balance,
-                    currency: result.data.currency,
-                    stake: result.data.stake
+                    playerId: data.playerId,
+                    sessionId: data.sessionId,
+                    balance: typeof data.balance === 'string' ? parseFloat(data.balance) : data.balance,
+                    currency: data.currency,
+                    stake: data.stake
                 };
 
                 this.updateUI();
                 console.log('Game initialized:', this.gameState);
             } else {
                 console.log('Failed to initialize game:', result.message);
+                this.showError(result.message || 'Initialization failed');
             }
         } catch (error) {
             console.log('Error initializing game:', error);
+            this.showError('Network error during initialization');
         }
     }
 
@@ -75,6 +78,7 @@ export class Wrapper extends Container {
     private async spinReels() {
         if (!this.gameState) {
             console.log('Game not initialized');
+            this.showError('Game not initialized');
             return;
         }
 
@@ -93,25 +97,40 @@ export class Wrapper extends Container {
                 })
             });
 
-            const result = await response.json();
+            let result;
+            try {
+                result = await response.json();
+            } catch (jsonError) {
+                console.error('Failed to parse JSON from backend:', jsonError);
+                this.showError('Invalid response from server.');
+                return;
+            }
 
-            if (result.status === 'success') {
+            if (result.status === 'success' && result.data) {
+                const data = result.data;
                 // Update game state
-                this.gameState.balance = parseFloat(result.data.balance);
+                this.gameState.balance = typeof data.balance === 'string' ? parseFloat(data.balance) : data.balance;
 
                 // Update UI
                 this.updateUI();
 
                 // Handle spin result
-                this.handleSpinResult(result.data.spinResult);
-
-                console.log('Spin result:', result.data.spinResult);
+                if (data.spinResult && data.spinResult.reels) {
+                    this.handleSpinResult(data.spinResult);
+                    console.log('Spin result:', data.spinResult);
+                } else {
+                    console.error('Spin result missing or malformed:', data.spinResult);
+                    this.showError('Invalid spin result from server.');
+                }
+            } else if (result.status === 'error') {
+                console.error('Backend error:', result.message);
+                this.showError(result.message || 'Spin failed');
             } else {
-                console.log('Spin failed:', result.message);
-                this.showError(result.message);
+                console.error('Unexpected backend response:', result);
+                this.showError('Unexpected response from server.');
             }
         } catch (error) {
-            console.log('Error during spin:', error);
+            console.error('Error during spin:', error);
             this.showError('Network error during spin');
         } finally {
             this.isSpinning = false;
@@ -120,8 +139,19 @@ export class Wrapper extends Container {
     }
 
     private handleSpinResult(spinResult: SpinResult) {
+        if (!spinResult) {
+            console.log('No spin result received.');
+            this.showError('No spin result from server.');
+            return;
+        }
+        if (!('reels' in spinResult) || !Array.isArray((spinResult as any).reels)) {
+            console.error('Spin result missing reels:', spinResult);
+            this.showError('Spin result from server is missing reels data. Please contact support.');
+            // Optionally, display other info for debugging
+            return;
+        }
         // Display reels result
-        this.displayReels(spinResult.reels);
+        this.displayReels((spinResult as any).reels);
 
         // Show win/loss message
         if (spinResult.isWin) {
@@ -131,12 +161,16 @@ export class Wrapper extends Container {
         }
 
         // Handle special features
-        if (spinResult.triggeredFeatures.length > 0) {
+        if (spinResult.triggeredFeatures && spinResult.triggeredFeatures.length > 0) {
             this.handleSpecialFeatures(spinResult.triggeredFeatures);
         }
     }
 
     private displayReels(reels: string[][]) {
+        if (!reels) {
+            console.log('Reels data is undefined.');
+            return;
+        }
         // For now, just log the reels
         // You can later implement visual reel display with PixiJS
         console.log('Reels result:', reels);

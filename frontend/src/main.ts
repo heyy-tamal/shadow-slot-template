@@ -1,5 +1,5 @@
 import { Application, Assets, Sprite } from "pixi.js";
-import { Wrapper } from "./wrapper";
+import { getServerResponse } from "./getServerResponse";
 
 (async () => {
   // Create a new application
@@ -11,8 +11,8 @@ import { Wrapper } from "./wrapper";
   // Append the application canvas to the document body
   document.getElementById("pixi-container")!.appendChild(app.canvas);
 
-  // Instantiate Wrapper to enable UI logic
-  new Wrapper();
+  // Instantiate server to enable UI logic
+  new getServerResponse();
 
   // Load the bunny texture
   const texture = await Assets.load("/assets/bunny.png");
